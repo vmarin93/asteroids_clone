@@ -1,0 +1,6 @@
+# Bytecode and caches
+__pycache__/
+
+# Virtual environments
+.venv/
+.uv/
