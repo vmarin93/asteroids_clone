@@ -1,6 +1,6 @@
 import pygame
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED
+from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED
 
 
 class Player(CircleShape):
@@ -10,10 +10,16 @@ class Player(CircleShape):
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-        a = self.position + forward * self.radius
-        b = self.position - forward * self.radius - right
-        c = self.position - forward * self.radius + right
+        # Original Boot.dev code
+            #right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
+            #a = self.position + forward * self.radius
+            # b = self.position - forward * self.radius - right
+            # c = self.position - forward * self.radius + right
+        # The code I wrote to satisfy lsp complaints about doing mathematical operations between a vector(composed of 2 floats) and a single float value
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90)
+        a = self.position + pygame.Vector2(forward.x * self.radius, forward.y * self.radius)
+        b = self.position - pygame.Vector2(forward.x * self.radius, forward.y * self.radius) - pygame.Vector2(right.x * (self.radius / 1.5), right.y * (self.radius / 1.5))
+        c = self.position - pygame.Vector2(forward.x * self.radius, forward.y * self.radius) + pygame.Vector2(right.x * (self.radius / 1.5), right.y * (self.radius / 1.5))
         return [a, b, c]
 
     def draw(self, screen):
@@ -29,3 +35,11 @@ class Player(CircleShape):
             self.rotate(-dt)
         if keys[pygame.K_d]:
             self.rotate(dt)
+        if keys[pygame.K_w]:
+            self.move(dt)
+        if keys[pygame.K_s]:
+            self.move(-dt)
+
+    def move(self, dt):
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        self.position += forward * PLAYER_SPEED * dt
